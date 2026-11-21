@@ -1,0 +1,147 @@
+#!/bin/sh
+# HyperFrames wrapper: pinned browser + pinned version, so renders do not depend
+# on a shell profile and never re-download Chrome. Canonical copy lives in the
+# kit repo (bin/hf); ~/.local/bin/hf is a symlink to it.
+#
+#   hf <command> ...                  e.g. hf check, hf render --crf 18, hf snapshot --at 0,3
+#   hf project <akun>                 create projects/<akun>/ (BRIEF.md + brand/)
+#   hf new <akun>/<video> [tpl]       copy templates/<tpl or template> -> projects/<akun>/<video>
+#   hf projects                       list accounts, their videos and render counts
+#   hf --help                         this text
+#
+# Layout: one account folder holds the brief and the shared brand assets; each
+# video is one HyperFrames project inside it.
+#   projects/<akun>/BRIEF.md
+#   projects/<akun>/brand/            -> copied into each video as assets/brand/
+#   projects/<akun>/<video>/index.html
+#   projects/<akun>/<video>/renders/
+set -eu
+
+HYPERFRAMES_VERSION="0.9.69"
+BROWSER="/home/kelanach/.cache/ms-playwright/chromium-1255/chrome-linux64/chrome"
+ROOT="${VIDEO_MAKER_ROOT:-/home/kelanach/Public/main-linux-kelanach/code-berkah-titipan-tuhan/code/personal_prjct/video-maker}"
+PROJECTS="$ROOT/projects"
+
+usage() {
+  cat <<'EOF'
+hf <command> ...                  e.g. hf check, hf render --crf 18, hf snapshot --at 0,3
+hf project <akun>                 create projects/<akun>/ (BRIEF.md + brand/)
+hf new <akun>/<video> [tpl]       copy templates/<tpl or template> -> projects/<akun>/<video>
+hf projects                       list accounts, their videos and render counts
+hf --help                         this text
+
+Templates shipped by the kit:
+  template      16:9 1920x1080 starter, 6 s, generic
+  template-pilar 9:16 1080x1920 pillar base, 22 s, dish JSON driven
+EOF
+}
+
+if [ -x "$BROWSER" ]; then
+  HYPERFRAMES_BROWSER_PATH="$BROWSER"
+  export HYPERFRAMES_BROWSER_PATH
+fi
+
+# renders/ count for one video folder
+count_renders() {
+  [ -d "$1/renders" ] || { echo 0; return; }
+  ls -1 "$1/renders" 2>/dev/null | wc -l | tr -d ' '
+}
+
+# a name must never be mistaken for a flag
+require_name() {
+  case "${1:-}" in
+    ""|-*) echo "usage: hf $2" >&2; exit 2 ;;
+  esac
+}
+
+case "${1:-}" in
+  -h|--help|help)
+    usage
+    exit 0
+    ;;
+  project)
+    require_name "${2:-}" "project <akun>"
+    product="$2"
+    dest="$PROJECTS/$product"
+    mkdir -p "$dest/brand"
+    if [ ! -f "$dest/BRIEF.md" ]; then
+      cp "$ROOT/template-project/BRIEF.md" "$dest/BRIEF.md"
+    fi
+    if [ ! -f "$dest/brand/README.md" ]; then
+      cp "$ROOT/template-project/brand/README.md" "$dest/brand/README.md"
+    fi
+    echo "project ready: $dest"
+    echo "  BRIEF.md   fill this in first — agents read it before writing any video"
+    echo "  brand/     logo, fonts, screens, music shared by every video in this project"
+    echo
+    echo "next: hf new $product/<video> [template]"
+    exit 0
+    ;;
+  new)
+    require_name "${2:-}" "new <akun>/<video> [template]"
+    name="$2"
+    tmpl_dir="$ROOT/${3:-template}"
+    [ -f "$tmpl_dir/index.html" ] || {
+      echo "no template at $tmpl_dir (have: $(ls -1 "$ROOT" | grep '^template' | tr '\n' ' '))" >&2
+      exit 2
+    }
+    dest="$PROJECTS/$name"
+    [ ! -e "$dest" ] || { echo "already exists: $dest" >&2; exit 2; }
+    product="$(dirname "$name")"
+    mkdir -p "$(dirname "$dest")"
+    cp -a "$tmpl_dir" "$dest"
+    rm -rf "$dest/renders" "$dest/.hyperframes"
+    # name the project after its folder, not the template's
+    video="$(basename "$name")"
+    for f in "$dest/meta.json" "$dest/package.json"; do
+      if [ -f "$f" ]; then
+        sed -i -e "s/\"hf-demo\"/\"$video\"/g" -e "s/\"template-pilar\"/\"$video\"/g" "$f"
+      fi
+    done
+    if [ "$product" != "." ]; then
+      if [ -d "$PROJECTS/$product/brand" ]; then
+        copied=0
+        for item in "$PROJECTS/$product/brand"/*; do
+          [ -e "$item" ] || continue
+          case "$(basename "$item")" in README.md) continue ;; esac
+          mkdir -p "$dest/assets/brand"
+          cp -a "$item" "$dest/assets/brand/"
+          copied=$((copied + 1))
+        done
+        if [ "$copied" -gt 0 ]; then
+          echo "brand assets -> assets/brand/ ($copied item(s))"
+        fi
+      fi
+      [ -f "$PROJECTS/$product/BRIEF.md" ] || \
+        echo "warning: no brief at projects/$product/BRIEF.md — run: hf project $product" >&2
+    fi
+    echo "created $dest from ${tmpl_dir#$ROOT/}"
+    exit 0
+    ;;
+  projects)
+    [ -d "$PROJECTS" ] || { echo "no projects yet: $PROJECTS" >&2; exit 0; }
+    for dir in "$PROJECTS"/*/; do
+      [ -d "$dir" ] || continue
+      product="$(basename "$dir")"
+      # legacy flat project: the folder itself is one video
+      if [ -f "$dir/index.html" ]; then
+        printf '%s  (flat, %s render(s))\n' "$product" "$(count_renders "$dir")"
+        continue
+      fi
+      printf '%s/\n' "$product"
+      [ -f "$dir/BRIEF.md" ] || printf '  (no BRIEF.md)\n'
+      videos=0
+      for video in "$dir"*/; do
+        [ -f "$video/index.html" ] || continue
+        videos=$((videos + 1))
+        printf '  %s  (%s render(s))\n' "$(basename "$video")" "$(count_renders "$video")"
+      done
+      if [ "$videos" -eq 0 ]; then
+        printf '  (no videos yet)\n'
+      fi
+    done
+    exit 0
+    ;;
+esac
+
+exec npx --yes "hyperframes@$HYPERFRAMES_VERSION" "$@"
