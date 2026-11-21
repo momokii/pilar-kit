@@ -54,6 +54,48 @@ Every number on screen must trace to a source here. No source, no number.
 - **Things we must not claim:**
 - **Legal / compliance wording required:**
 
+## 5b. Dish data — only for pillar (9:16) accounts
+
+If this account uses `template-pilar`, the video is generated from one JSON per dish, not
+written by hand. Put it in `projects/<akun>/dishes/<provinsi>-<slug>.json`:
+
+```json
+{
+  "id": "<provinsi>-<slug>",
+  "edisi": 1,
+  "provinsi": "Sumatera Barat",
+  "provinsi_id": "sumatera-barat",
+  "nama": "Rendang",
+  "hook": "Satu baris pembuka, maksimal 2 baris di layar.",
+  "fakta": [
+    { "teks": "Satu klaim per fakta, satu baris.", "ikon": "kuali", "tingkat": 2, "sumber": "…" }
+  ],
+  "sumber": [ { "tingkat": 2, "sitasi": "…", "doi": "…" } ],
+  "kartu_akhir": { "sumber_baris": [ "…" ] },
+  "atribusi_peta": "geoBoundaries (ODbL)"
+}
+```
+
+- **`provinsi_id` harus slug yang ada di `template/assets/maps/provinces.json`** (34 provinsi).
+  Display name in `provinsi` is free text; the slug drives the map highlight.
+- **`fakta` exactly three.** `build-dish.py` refuses anything else, and refuses a fact that
+  wraps past three lines at 36 characters.
+- **`ikon`** picks from `tools/icons/`: `jam`, `bumbu`, `peta`, `kuali`, `cabai`, `empat`,
+  `bawang`. Unknown value falls back to `bumbu` — fix the data instead of accepting the fallback.
+- **Sources follow `content/BRIEF.md` §13.** One claim = one level 1–2 source. Disputed claims
+  are written as "diklaim". No source, no fact — drop the fact, not the rule.
+- Attribution `Peta: geoBoundaries (ODbL)` is rendered automatically on the end card; never
+  remove it.
+
+Then:
+
+```bash
+hf new <akun>/<video> template-pilar
+python3 tools/build-dish.py --data projects/<akun>/dishes/<slug>.json \
+        --dest projects/<akun>/<video> --force
+cd projects/<akun>/<video> && hf check && hf snapshot --at 0,3.2,6.5,11.5 && hf render
+```
+
 ## 6. Audio
 
 - **Music mood:** (calm / driving / ambient / none)

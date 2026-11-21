@@ -256,3 +256,21 @@ petarasa/                        akun — berubah setiap hari
 ```
 
 Satu thread = satu akun, dibuka di folder akun. Thread di `video-maker` hanya untuk mengubah kit.
+
+---
+
+## 15. Status kit (2026-11-21)
+
+| Keputusan | Nilai |
+|---|---|
+| Template pilar | `template-pilar/` — 1080×1920, 30 fps, 22 s, sub-komposisi `hud · hook · peta · f1 · f2 · f3 · end`, `hf check` bersih (0 error/warning, 36/36 AA) |
+| Peta | dipakai: `tools/build-map.py` → `assets/maps/`, disorot per `provinsi_id`, zoom + ping dihitung dari bounding box path; atribusi `Peta: geoBoundaries (ODbL)` di kartu akhir |
+| Data → komposisi | `tools/build-dish.py` + `tools/pilar-templates/*.tmpl`. Agen menulis `dishes/<slug>.json`, bukan HTML. Skema: §9.4 |
+| Audio | satu bed 22 s (`--duration 22 --ticks 5,10,15 --arrival 19.6`), dipakai semua video pilar |
+| **Caption** | **teks di layar (burned), bukan ASR.** Audio pilar = bed + tick, tanpa narasi, jadi `hf transcribe --to srt` tidak dipakai. Maksimal 2–3 baris per beat; teks fakta di-wrap 36 karakter oleh builder |
+| Diagram per hidangan | **konten akun, bukan kit.** Kit memberi beat fakta generik (teks + ikon); diagram khusus (mangkuk kalio vs rendang, odometer jam, grid bahan) tetap dibuat per hidangan di folder akun |
+| Varian pilar lain | belum ada; baru pilar peta + tiga fakta |
+
+Catatan cakupan: `build-dish.py` menolak data yang tidak memenuhi kontrak (bukan tiga fakta,
+`provinsi_id` tidak ada di peta, fakta lebih dari tiga baris) — supaya `hf check` selalu mulai
+dari frame yang valid.

@@ -2,46 +2,51 @@
 
 Repo ini **kit produksi**, bukan repo konten. Kit menyediakan mesin (template, tools, brief);
 akun video memakainya. Satu thread untuk kit, thread terpisah per akun — jangan dicampur.
+Repo ini git sejak 2026-11-21; `projects/` adalah data produksi dan sengaja tidak di-track.
 
 ## Peta folder
 
 ```
 video-maker/                 KIT — jarang berubah
-  template/                  komposisi starter 16:9; `hf check` harus lolos
+  bin/hf                     wrapper (kanonik; ~/.local/bin/hf → symlink ke sini)
+  template/                  starter 16:9 1920x1080, 6 s
+  template-pilar/            pilar 9:16 1080x1920, 22 s (hud/hook/peta/f1-f3/end)
   template-project/          kerangka folder akun: BRIEF.md + brand/
-  tools/                     skrip deterministik (build-map.py)
-  content/BRIEF.md           brief akun pilot: format, pilar, lisensi, kebijakan sumber
-  projects/<akun>/           DATA AKUN — brief, brand, komposisi, renders/
-  README.md  HANDOFF.md      struktur & status terpasang
+  tools/                     build-map.py, build-dish.py, pilar-templates/, icons/
+  content/BRIEF.md           brief akun pilot; content/examples/ = data contoh
+  projects/<akun>/           DATA AKUN — brief, brand, dishes/, video, renders/
 ```
 
-Boleh diubah di sini: `template/`, `template-project/`, `tools/`, `content/`, `README.md`,
-`HANDOFF.md`, `AGENTS.md` ini. **Jangan** mengedit `projects/<akun>/` (data akun, bukan kit),
-jangan mengunggah apa pun, dan jangan mengubah wrapper `~/.local/bin/hf` tanpa menyebut alasannya
+Boleh diubah di sini: `template/`, `template-pilar/`, `template-project/`, `tools/`, `content/`,
+`bin/hf`, `README.md`, `HANDOFF.md`, `AGENTS.md` ini. **Jangan** mengedit `projects/<akun>/`
+(data akun, bukan kit), jangan mengunggah apa pun. Ubah wrapper `hf` hanya dengan alasan tertulis
 di laporan.
 
 ## Perintah
 
 ```bash
-hf projects                    # daftar akun/produk, videonya, jumlah render
-hf project <akun>              # projects/<akun>/ + BRIEF.md + brand/
-hf new <akun>/<video>          # salin template (+ brand/) → projects/<akun>/<video>
+hf projects                        # daftar akun, video, jumlah render
+hf project <akun>                  # projects/<akun>/ + BRIEF.md + brand/
+hf new <akun>/<video> [template]   # template/ (default) atau template-pilar/
 cd projects/<akun>/<video>
-hf check                       # gate: lint, runtime, layout, motion, kontras AA, audio
-hf snapshot --at 0,3,6         # PNG frame kunci — dibaca sebelum render
-hf render --crf 20             # → renders/<video>_<timestamp>.mp4
+python3 ../../../tools/build-dish.py --data ../dishes/<slug>.json --dest . --force
+hf check                           # gate: lint, runtime, layout, motion, kontras AA, audio
+hf snapshot --at 0,3.2,6.5,11.5     # PNG frame kunci — dibaca sebelum render
+hf render --crf 20                 # → renders/<video>_<timestamp>.mp4
 ```
 
-Selalu `hf`, jangan `npx hyperframes`: wrapper memaku versi 0.9.69 + Chromium lokal.
+Untuk video pilar: **tulis JSON, bukan HTML**. `build-dish.py` mengisi nama, hook, provinsi +
+sorotan peta, tiga fakta, sumber, atribusi. Jangan menyunting teks hasil generate — ubah JSON,
+jalankan ulang dengan `--force`. Selalu `hf`, jangan `npx hyperframes` (wrapper memaku 0.9.69).
 
 ## Lisensi aset — harga mati
 
 | Aset | Aturan |
 |---|---|
-| Peta | geoBoundaries gbOpen IDN ADM1, **ODbL 1.0**. Atribusi wajib di kartu akhir: `Peta: geoBoundaries (ODbL)`. Dibangun ulang lewat `python3 tools/build-map.py`, bukan sumber lain. Cakupan 34 provinsi (pemekaran Papua 2022 belum ada) |
+| Peta | geoBoundaries gbOpen IDN ADM1, **ODbL 1.0**. Atribusi wajib di kartu akhir: `Peta: geoBoundaries (ODbL)`. Dibangun lewat `python3 tools/build-map.py`, bukan sumber lain. Cakupan 34 provinsi (pemekaran Papua 2022 belum ada) |
 | Audio | digenerate lokal & deterministik: `python3 tools/make-soundtrack.py` (ffmpeg → AAC). Tanpa musik pihak ketiga |
 | Foto / gambar | **tidak ada** foto pihak ketiga, footage, atau wajah. Visual = tipografi + SVG peta + gerak |
-| Font | hanya file di `assets/fonts/`, didaftarkan lewat `@font-face` |
+| Font | bundel (`Inter`, `JetBrains Mono`) atau file di `assets/fonts/` lewat `@font-face` |
 | Klaim | satu fakta = satu sumber tingkat 1–2 (`content/BRIEF.md` §13); klaim sengketa ditulis "diklaim" |
 
 ## Gate sebelum render
@@ -53,6 +58,6 @@ Selalu `hf`, jangan `npx hyperframes`: wrapper memaku versi 0.9.69 + Chromium lo
 
 ## Batas
 
-- Thread kit: ubah kit, verifikasi (`hf projects`, `cd template && hf check`), lalu lapor.
+- Thread kit: ubah kit, verifikasi (`hf projects`, `cd template-pilar && hf check`), lalu lapor.
 - Thread akun: kerjakan video akun itu; jangan mengubah kit demi satu video.
 - Yang tidak bisa diverifikasi → tulis `NOT VERIFIED`. Jangan klaim selesai tanpa bukti.
