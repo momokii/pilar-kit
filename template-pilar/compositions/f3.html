@@ -1,0 +1,41 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; }
+    #f3-def { top: 560px; }
+    #f3-plate {
+      position: absolute; left: 96px; top: 800px; width: 340px; height: 340px;
+      border: 2px solid var(--tinta);
+    }
+    #f3-icon {
+      position: absolute; left: 96px; top: 800px; width: 340px; height: 340px;
+      padding: 60px;
+    }
+    #f3-icon svg { display: block; width: 220px; height: 220px; }
+    #f3-rule {
+      position: absolute; left: 96px; top: 1230px; width: 240px; height: 8px;
+      background: var(--cabai); transform-origin: 0 50%;
+    }
+    #f3-num { top: 1290px; color: var(--cabai); }
+  </style>
+  <div id="root" data-composition-id="f3" data-width="1080" data-height="1920">
+    <p class="def" id="f3-def" data-layout-allow-safe-zone>Tiap bahan rendang punya makna di<br/>Minang.</p>
+    <div id="f3-plate" data-layout-ignore></div>
+    <div id="f3-icon" data-layout-ignore><svg viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#1B1714" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><circle cx="52" cy="52" r="14"/><circle cx="98" cy="52" r="14"/><circle cx="52" cy="98" r="14"/><circle cx="98" cy="98" r="14"/></svg></div>
+    <div class="rule" id="f3-rule"></div>
+    <div class="label" id="f3-num" data-layout-allow-safe-zone>Fakta 03 / 03</div>
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const tl = gsap.timeline({ paused: true });
+    /* masuk = gerak, bukan pudar; lalu drift halus supaya frame tidak diam */
+    tl.fromTo("#f3-def", { y: 14 }, { y: 0, duration: 0.3, ease: "power2.out" }, 0);
+    tl.fromTo("#f3-plate", { y: 20 }, { y: 0, duration: 0.3, ease: "power2.out" }, 0.12);
+    tl.fromTo("#f3-icon", { y: 20 }, { y: 0, duration: 0.3, ease: "power2.out" }, 0.12);
+    tl.fromTo("#f3-rule", { scaleX: 0 },
+      { scaleX: 1, duration: 0.4, ease: "power1.out", immediateRender: false }, 0.4);
+    tl.fromTo("#f3-num", { y: 8 }, { y: 0, duration: 0.3, ease: "power2.out" }, 0.3);
+    tl.to("#f3-icon", { y: 6, duration: 3.6, ease: "none" }, 0.9);
+    window.__timelines["f3"] = tl;
+    tl.seek(0);
+  </script>
+</template>

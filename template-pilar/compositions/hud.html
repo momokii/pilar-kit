@@ -1,0 +1,19 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; }
+    #hud-prov { left: 96px; width: 888px; text-align: right; }
+  </style>
+  <div id="root" data-composition-id="hud" data-width="1080" data-height="1920">
+    <div class="label" id="hud-seri" data-layout-allow-safe-zone><span>Kit</span><i class="dot"></i><span>001</span></div>
+    <div class="label" id="hud-prov" data-layout-allow-safe-zone>Sumatera Barat</div>
+    <div class="track"></div>
+    <div class="fill" id="hud-fill"></div>
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#hud-fill", { scaleX: 0 }, { scaleX: 1, duration: 22, ease: "none" }, 0);
+    window.__timelines["hud"] = tl;
+    tl.seek(0);
+  </script>
+</template>

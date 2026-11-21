@@ -1,0 +1,41 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; }
+    #f1-def { top: 560px; }
+    #f1-plate {
+      position: absolute; left: 96px; top: 800px; width: 340px; height: 340px;
+      border: 2px solid var(--tinta);
+    }
+    #f1-icon {
+      position: absolute; left: 96px; top: 800px; width: 340px; height: 340px;
+      padding: 60px;
+    }
+    #f1-icon svg { display: block; width: 220px; height: 220px; }
+    #f1-rule {
+      position: absolute; left: 96px; top: 1230px; width: 240px; height: 8px;
+      background: var(--cabai); transform-origin: 0 50%;
+    }
+    #f1-num { top: 1290px; color: var(--cabai); }
+  </style>
+  <div id="root" data-composition-id="f1" data-width="1080" data-height="1920">
+    <p class="def" id="f1-def" data-layout-allow-safe-zone>Kalio itu rendang yang belum kering.</p>
+    <div id="f1-plate" data-layout-ignore></div>
+    <div id="f1-icon" data-layout-ignore><svg viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#1B1714" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="75" cy="60" rx="46" ry="12"/><path d="M29 60 C29 96 47 122 75 122 C103 122 121 96 121 60"/><path d="M121 66 L138 58"/><path d="M29 66 L12 58"/></svg></div>
+    <div class="rule" id="f1-rule"></div>
+    <div class="label" id="f1-num" data-layout-allow-safe-zone>Fakta 01 / 03</div>
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const tl = gsap.timeline({ paused: true });
+    /* masuk = gerak, bukan pudar; lalu drift halus supaya frame tidak diam */
+    tl.fromTo("#f1-def", { y: 14 }, { y: 0, duration: 0.3, ease: "power2.out" }, 0);
+    tl.fromTo("#f1-plate", { y: 20 }, { y: 0, duration: 0.3, ease: "power2.out" }, 0.12);
+    tl.fromTo("#f1-icon", { y: 20 }, { y: 0, duration: 0.3, ease: "power2.out" }, 0.12);
+    tl.fromTo("#f1-rule", { scaleX: 0 },
+      { scaleX: 1, duration: 0.4, ease: "power1.out", immediateRender: false }, 0.4);
+    tl.fromTo("#f1-num", { y: 8 }, { y: 0, duration: 0.3, ease: "power2.out" }, 0.3);
+    tl.to("#f1-icon", { y: 6, duration: 3.6, ease: "none" }, 0.9);
+    window.__timelines["f1"] = tl;
+    tl.seek(0);
+  </script>
+</template>

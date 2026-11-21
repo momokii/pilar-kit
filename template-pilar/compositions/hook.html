@@ -1,0 +1,24 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; }
+    #h1-word { top: 660px; }
+    #h1-rule { top: 850px; }
+    #h1-sub { top: 920px; }
+  </style>
+  <div id="root" data-composition-id="hook" data-width="1080" data-height="1920">
+    <h1 class="hero" id="h1-word" data-layout-allow-safe-zone><span class="ch">R</span><span class="ch">e</span><span class="ch">n</span><span class="ch">d</span><span class="ch">a</span><span class="ch">n</span><span class="ch">g</span></h1>
+    <div class="rule" id="h1-rule"></div>
+    <p class="lead" id="h1-sub" data-layout-allow-safe-zone>Ini bukan rendang biasa.</p>
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const tl = gsap.timeline({ paused: true });
+    /* type kinetik: tiap huruf naik, 0.045 s jeda */
+    tl.fromTo("#h1-word .ch", { y: 44 },
+      { y: 0, duration: 0.4, ease: "power3.out", stagger: 0.045 }, 0);
+    tl.fromTo("#h1-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.35, ease: "power1.out" }, 0.45);
+    tl.fromTo("#h1-sub", { y: 14 }, { y: 0, duration: 0.35, ease: "power2.out" }, 0.5);
+    window.__timelines["hook"] = tl;
+    tl.seek(0);
+  </script>
+</template>

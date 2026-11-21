@@ -1,0 +1,43 @@
+{
+  "id": "contoh-rendang",
+  "contoh": true,
+  "edisi": 1,
+  "seri": "Kit",
+  "handle": "@contoh",
+  "provinsi": "Sumatera Barat",
+  "provinsi_id": "sumatera-barat",
+  "nama": "Rendang",
+  "hook": "Ini bukan rendang biasa.",
+  "fakta": [
+    {
+      "teks": "Kalio itu rendang yang belum kering.",
+      "ikon": "kuali",
+      "tingkat": 2,
+      "sumber": "Rini, Azima, Sayuti & Novelina (2016), Agriculture and Agricultural Science Procedia 9: 335-341"
+    },
+    {
+      "teks": "Daging, santan, dan bumbu dimasak 6-7 jam.",
+      "ikon": "jam",
+      "tingkat": 2,
+      "sumber": "Rini, Azima, Sayuti & Novelina (2016), Agriculture and Agricultural Science Procedia 9: 335-341"
+    },
+    {
+      "teks": "Tiap bahan rendang punya makna di Minang.",
+      "ikon": "empat",
+      "tingkat": 2,
+      "sumber": "Tanjung, Manugeren & Purwarno (2020), AICLL 3(1): 70-81"
+    }
+  ],
+  "sumber": [
+    { "tingkat": 2, "sitasi": "Rini, Azima F., Sayuti K., Novelina (2016). The Evaluation of Nutritional Value of Rendang Minangkabau. Agric. Agric. Sci. Procedia 9: 335-341.", "doi": "10.1016/j.aaspro.2016.02.146" },
+    { "tingkat": 2, "sitasi": "Tanjung N.N., Manugeren M., Purwarno (2020). Philosophical Meanings of Traditional Cuisine Rendang Minangkabau. AICLL 3(1): 70-81.", "doi": "10.30743/aicll.v3i1.80" }
+  ],
+  "kartu_akhir": {
+    "sumber_baris": [
+      "Agric. Agric. Sci. Procedia 9 (2016)",
+      "AICLL 3(1) (2020)"
+    ]
+  },
+  "atribusi_peta": "geoBoundaries (ODbL)",
+  "catatan": "CONTOH KIT, bukan naskah produksi. Data asli per akun tinggal di projects/<akun>/dishes/. Dua fakta pertama berasal dari satu makalah yang sama; klaim sengketa (asal-usul, klaim negara lain) tidak dipakai karena belum ada rujukan tingkat 1-2."
+}
