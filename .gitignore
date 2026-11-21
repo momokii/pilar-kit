@@ -1,0 +1,10 @@
+# render artifacts — regenerate with `hf render`
+projects/*/renders/
+projects/*/*/renders/
+.hyperframes/
+node_modules/
+*.wav
+
+# kit sample render
+/template-pilar/renders/
+/template-pilar/.hyperframes/
