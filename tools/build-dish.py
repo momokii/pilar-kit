@@ -203,19 +203,6 @@ def main() -> int:
         if not data.get(field):
             fail(f"dish JSON is missing {field!r}")
 
-    dest = Path(args.dest).expanduser()
-    if not dest.exists():
-        source = Path(args.from_template) if args.from_template else BASE_TEMPLATE
-        if not (source / "index.html").exists():
-            fail(f"cannot seed {dest}: no template at {source}")
-        shutil.copytree(source, dest)
-        shutil.rmtree(dest / "renders", ignore_errors=True)
-        shutil.rmtree(dest / ".hyperframes", ignore_errors=True)
-        print(f"seeded {dest} from {source.relative_to(ROOT) if source.is_relative_to(ROOT) else source}")
-    elif not args.force:
-        # an existing project is only rewritten when the caller says so
-        if not (dest / "index.html").exists():
-            fail(f"{dest} exists but is not a project (no index.html)")
 
     paths, vb_w, vb_h = map_index()
     svg, zoom_x, zoom_y, map_height = map_svg(data["provinsi_id"], paths, vb_w, vb_h)
@@ -242,11 +229,8 @@ def main() -> int:
         "ATRIBUSI": html.escape(data.get("atribusi_peta", "geoBoundaries (ODbL)"), quote=False),
     }
 
-    (dest / "compositions").mkdir(exist_ok=True)
-    written = []
-    written.append((dest / "index.html", render("index", tokens)))
-    for scene in ("hud", "hook", "peta", "end"):
-        written.append((dest / "compositions" / f"{scene}.html", render(scene, tokens)))
+    # every check that can fail runs before the filesystem is touched
+    fact_tokens_list = []
     for index, fact in enumerate(facts, start=1):
         fact_tokens = dict(tokens)
         fact_tokens.update({
@@ -255,6 +239,28 @@ def main() -> int:
             "FACT_TEXT": fact_html(fact.get("teks", "")),
             "ICON_SVG": icon_svg(fact.get("ikon", "")),
         })
+        fact_tokens_list.append(fact_tokens)
+
+    dest = Path(args.dest).expanduser()
+    seeded = False
+    if not dest.exists():
+        source = Path(args.from_template) if args.from_template else BASE_TEMPLATE
+        if not (source / "index.html").exists():
+            fail(f"cannot seed {dest}: no template at {source}")
+        shutil.copytree(source, dest)
+        shutil.rmtree(dest / "renders", ignore_errors=True)
+        shutil.rmtree(dest / ".hyperframes", ignore_errors=True)
+        seeded = True
+        print(f"seeded {dest} from {source.relative_to(ROOT) if source.is_relative_to(ROOT) else source}")
+    elif not args.force:
+        fail(f"{dest} already exists — pass --force to regenerate its compositions")
+
+    (dest / "compositions").mkdir(exist_ok=True)
+    written = []
+    written.append((dest / "index.html", render("index", tokens)))
+    for scene in ("hud", "hook", "peta", "end"):
+        written.append((dest / "compositions" / f"{scene}.html", render(scene, tokens)))
+    for index, fact_tokens in enumerate(fact_tokens_list, start=1):
         written.append((dest / "compositions" / f"f{index}.html", render("fakta", fact_tokens)))
 
     for path, text in written:
@@ -274,8 +280,8 @@ def main() -> int:
     print(
         f"{data['nama']} · {data['provinsi']} · edisi {tokens['EDITION']} -> {dest}\n"
         f"  {len(written)} files, {DURATION} s, 1080x1920, highlight={data['provinsi_id']}, "
-        f"zoom {zoom_x:.1f}/{zoom_y:.1f} @{ZOOM_SCALE}\n"
-        f"  next: cd {dest} && hf check && hf snapshot --at 0,3.2,6.5,11.5,16.5,20.5"
+        f"zoom {zoom_x:.1f}/{zoom_y:.1f} @{ZOOM_SCALE}" + (" (seeded)" if seeded else "")
+        + f"\n  next: cd {dest} && hf check && hf snapshot --at 0,3.2,6.5,11.5,16.5,20.5"
     )
     return 0
 
