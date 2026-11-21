@@ -2,10 +2,14 @@
   <style>
     #root { position: absolute; inset: 0; }
     #hud-prov { left: 96px; width: 888px; text-align: right; }
+    /* peta di belakang HUD: alas krem hanya di belakang teks, bukan selebar baris */
+    #hud-seri .mask, #hud-prov .mask {
+      display: inline-block; background: var(--krem); padding: 6px 0;
+    }
   </style>
   <div id="root" data-composition-id="hud" data-width="1080" data-height="1920">
-    <div class="label" id="hud-seri" data-layout-allow-safe-zone><span>{{SERI}}</span><i class="dot"></i><span>{{EDITION}}</span></div>
-    <div class="label" id="hud-prov" data-layout-allow-safe-zone>{{PROVINCE}}</div>
+    <div class="label" id="hud-seri" data-layout-allow-safe-zone><span class="mask"><span>{{SERI}}</span><i class="dot"></i><span>{{EDITION}}</span></span></div>
+    <div class="label" id="hud-prov" data-layout-allow-safe-zone><span class="mask">{{PROVINCE}}</span></div>
     <div class="track"></div>
     <div class="fill" id="hud-fill"></div>
   </div>
