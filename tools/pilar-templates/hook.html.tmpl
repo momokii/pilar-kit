@@ -1,9 +1,9 @@
 <template>
   <style>
     #root { position: absolute; inset: 0; }
-    #h1-word { top: 660px; }
-    #h1-rule { top: 850px; }
-    #h1-sub { top: 920px; }
+    #h1-word { top: {{HOOK_TOP}}px; }
+    #h1-rule { top: {{HOOK_RULE_TOP}}px; }
+    #h1-sub { top: {{HOOK_SUB_TOP}}px; }
   </style>
   <div id="root" data-composition-id="hook" data-width="1080" data-height="1920">
     <h1 class="hero" id="h1-word" data-layout-allow-safe-zone>{{NAME_CHARS}}</h1>

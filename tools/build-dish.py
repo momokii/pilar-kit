@@ -74,18 +74,55 @@ def fact_html(text: str) -> str:
     return "<br/>".join(html.escape(line, quote=False) for line in lines)
 
 
-def name_size(name: str) -> tuple[int, int]:
-    n = len(name)
-    hero = 150 if n <= 9 else 118 if n <= 12 else 96 if n <= 15 else 84
-    small = 96 if n <= 14 else 76 if n <= 18 else 64
-    return hero, small
+# Measured on Inter 800 with -0.03em tracking: a glyph advances ~0.50 em, and the
+# last glyph of a 24-char name at 84 px ended 10.8 px past the canvas edge.
+CHAR_EM = 0.52
+HERO_SIZES = (150, 118, 96, 84, 72, 64)
+SMALL_SIZES = (96, 84, 72, 64, 56)
+COLUMN = 888
 
 
-def name_chars(name: str) -> str:
-    cells = "".join(
-        f'<span class="ch">{"&nbsp;" if ch == " " else html.escape(ch)}</span>' for ch in name
+def fit(text: str, sizes: tuple[int, ...], max_lines: int = 2) -> tuple[int, list[str]]:
+    """Largest size at which the text wraps into max_lines inside the 888 px column."""
+    words = text.split()
+    for size in sizes:
+        limit = int(COLUMN / (CHAR_EM * size)) - 1
+        lines: list[str] = []
+        current = ""
+        for word in words:
+            candidate = f"{current} {word}".strip()
+            if len(candidate) <= limit or not current:
+                current = candidate
+            else:
+                lines.append(current)
+                current = word
+        if current:
+            lines.append(current)
+        if len(lines) <= max_lines:
+            return size, lines
+    size = sizes[-1]
+    limit = int(COLUMN / (CHAR_EM * size)) - 1
+    lines, current = [], ""
+    for word in words:
+        candidate = f"{current} {word}".strip()
+        if len(candidate) <= limit or not current:
+            current = candidate
+        else:
+            lines.append(current)
+            current = word
+    if current:
+        lines.append(current)
+    return size, lines
+
+
+def name_lines(name: str, sizes: tuple[int, ...]) -> tuple[int, str, int]:
+    """Size plus markup: one line stays nowrap, two lines wrap inside the column."""
+    size, lines = fit(name, sizes)
+    markup = "<br/>".join(
+        "".join(f'<span class="ch">{"&nbsp;" if ch == " " else html.escape(ch)}</span>' for ch in line)
+        for line in lines
     )
-    return cells
+    return size, markup, len(lines)
 
 
 def map_index() -> tuple[dict[str, str], float, float]:
@@ -134,7 +171,9 @@ def map_svg(province_id: str, paths: dict[str, str], vb_w: float, vb_h: float) -
 
 def icon_svg(ikon: str) -> str:
     path = ICONS / f"{ikon}.svg"
-    if not path.exists():
+    if not ikon or not path.exists():
+        # a wrong icon must never ship silently
+        print(f"build-dish: warning: ikon {ikon!r} not in tools/icons/, using 'bumbu'", file=sys.stderr)
         path = ICONS / "bumbu.svg"
     return path.read_text().strip()
 
@@ -207,7 +246,14 @@ def main() -> int:
     paths, vb_w, vb_h = map_index()
     svg, zoom_x, zoom_y, map_height = map_svg(data["provinsi_id"], paths, vb_w, vb_h)
     seri, handle = identity(data, data_path, args)
-    hero, small = name_size(data["nama"])
+    hero, hero_markup, hero_lines = name_lines(data["nama"], HERO_SIZES)
+    small, small_markup, _ = name_lines(data["nama"], SMALL_SIZES)
+    handle_size, _ = fit(handle, SMALL_SIZES, max_lines=1)
+    # the hook lockup moves up when the headword needs two lines, so the rule and the
+    # lead never collide with it
+    hook_top = 660 if hero_lines == 1 else 560
+    hook_rule = hook_top + int(hero * 1.05 * hero_lines) + 30
+    hook_sub = hook_rule + 70
 
     tokens = {
         "SERI": html.escape(seri, quote=False),
@@ -216,9 +262,15 @@ def main() -> int:
         "DISH": html.escape(data["nama"], quote=False),
         "HOOK": html.escape(data.get("hook", ""), quote=False),
         "HANDLE": html.escape(handle, quote=False),
-        "NAME_CHARS": name_chars(data["nama"]),
+        "NAME_CHARS": hero_markup,
+        "NAME_CHARS_SM": small_markup,
+        "NAME_WRAP_CLASS": " wrap" if "<br/>" in small_markup else "",
         "NAME_SIZE": hero,
         "NAME_SIZE_SM": small,
+        "HANDLE_SIZE": handle_size,
+        "HOOK_TOP": hook_top,
+        "HOOK_RULE_TOP": hook_rule,
+        "HOOK_SUB_TOP": hook_sub,
         "DURATION": DURATION,
         "MAP_SVG": svg,
         "MAP_HEIGHT": f"{map_height:.1f}",

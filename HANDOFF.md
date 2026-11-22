@@ -65,7 +65,7 @@ Make, revise and render videos from HTML/CSS with HyperFrames.
 | Project starter | `template-project/` (`BRIEF.md`, `brand/README.md`) | `hf project` tested; brief not yet filled for a real product |
 | Accounts | `projects/<akun>/<video>/` | present locally and **untracked**: `petarasa/` (rendang built by hand), `v3-boxbox`, `kevelry-v3`, legacy `demo-e2e`. Never committed; a fresh clone starts empty |
 | CLI wrapper | `bin/hf` → `~/.local/bin/hf` | pins `hyperframes@0.9.69` + Chromium; `hf --help`, template arg tested |
-| Kit gate | `bin/kit-check` (11 checks) | green on 2026-11-22: templates, drift, licence, git hygiene |
+| Kit gate | `bin/kit-check` (12 checks) | green on 2026-11-22: templates, drift, licence, long-name regression, git hygiene |
 | Repo | `origin` = github.com/momokii/pilar-kit | public, `main` = `v0.1.1`, MIT; topics + GitHub Release still unset (metadata, not git) |
 | Skills | `~/.agents/skills/hyperframes{,-cli,-registry}`, `media-use`, `reverse-any-video`, `style-sampling` | installed on disk |
 | Agent rules | `~/.pi/agent/AGENTS.md`, `~/.config/opencode/AGENTS.md` → "Video & motion" | present |
@@ -171,6 +171,8 @@ Revisions edit the existing project, never a new one.
 | `hf new` fails on `<akun>/<video>` | parent folder missing | `hf new` creates it; `hf project <akun>` first to get the brief |
 | `build-dish: unknown provinsi_id` | slug not in the map | use the slug from `template/assets/maps/provinces.json` (e.g. `sumatera-barat`), not the display name |
 | `build-dish: fact too long` | fact wraps past three lines at 36 chars | shorten the fact; the builder refuses rather than overflow |
+| `build-dish: warning: ikon … not in tools/icons/` | dish JSON names an icon that does not exist | use one of `jam` `bumbu` `peta` `kuali` `cabai` `empat` `bawang`; the fallback is `bumbu` |
+| Long dish name runs off the canvas | a name used to overflow at 84 px | fixed in the builder: names wrap to two lines and the hook lockup moves down; `bin/kit-check` guards it |
 | `build-dish: exactly three facts` | more or fewer than three | a pillar video is one province, one dish, three facts |
 | `outside_safe_zone` warnings | brand grid is wider than the modelled TikTok zone | keep `data-layout-allow-safe-zone` on text that the brand grid deliberately places there |
 

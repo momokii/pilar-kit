@@ -92,6 +92,28 @@ else
   fail "builder: example data missing at ${SAMPLE#"$ROOT"/}"
 fi
 
+# 3b. a long dish name wraps instead of running off the canvas (regression: it used to)
+long_json="$TMP/long-name.json"
+python3 - "$SAMPLE" "$long_json" <<'PYDATA'
+import json, sys
+data = json.load(open(sys.argv[1]))
+data["nama"] = "Papeda Ikan Kuah Kuning Goreng Spesial"
+data["provinsi_id"] = "maluku"
+json.dump(data, open(sys.argv[2], "w"))
+PYDATA
+if python3 "$ROOT/tools/build-dish.py" --data "$long_json" --dest "$TMP/long" >"$TMP/long.log" 2>&1; then
+  hook="$TMP/long/compositions/hook.html"
+  size="$(sed -n 's/.*#h1-word { top: \([0-9]*\)px.*/\1/p' "$hook" | head -1)"
+  if grep -q '<br/>' "$hook" && [[ -n "$size" ]] && (( size < 660 )); then
+    pass 'builder: a 38-character dish name wraps instead of overflowing'
+  else
+    fail 'builder: long dish name did not wrap (hook top unchanged or no line break)'
+  fi
+else
+  tail -5 "$TMP/long.log" >&2
+  fail 'builder: failed on a long dish name'
+fi
+
 # 4. builder refuses bad data instead of shipping a broken frame
 bad_province="$TMP/bad-province.json"
 python3 - "$SAMPLE" "$bad_province" <<'PY'
