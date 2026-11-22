@@ -1,0 +1,123 @@
+#!/usr/bin/env bash
+# Kit health check: one command that proves the engine still builds, checks and
+# renders the same thing an account would get.
+#
+#   bin/kit-check            use the check cache (fast)
+#   bin/kit-check --fresh    re-check from scratch (slower, no cache)
+#
+# Exits 0 only when every gate passes. Read-only: it never writes inside
+# projects/, and the builder runs in a mktemp dir that is removed on exit.
+set -Eeuo pipefail
+
+ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+HF="$ROOT/bin/hf"
+SAMPLE="$ROOT/content/examples/contoh-rendang.json"
+FRESH=()
+
+for arg in "$@"; do
+  case "$arg" in
+    --fresh) FRESH=(--no-cache) ;;
+    -h|--help) sed -n '2,9p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    *) printf 'kit-check: unknown argument %s\n' "$arg" >&2; exit 2 ;;
+  esac
+done
+
+TMP="$(mktemp -d)"
+trap 'rm -rf "$TMP"' EXIT
+
+failures=0
+fail() { printf '  FAIL  %s\n' "$1" >&2; failures=$((failures + 1)); }
+pass() { printf '  ok    %s\n' "$1"; }
+
+verdict() { # $1 = project dir, $2 = label
+  local out
+  if ! out="$(cd -- "$1" && "$HF" check "${FRESH[@]}" 2>&1)"; then
+    printf '%s\n' "$out" | tail -25 >&2
+    fail "$2: hf check did not pass"
+    return
+  fi
+  if printf '%s\n' "$out" | grep -q '◇  Check passed'; then
+    local errors warnings
+    errors="$(printf '%s\n' "$out" | grep -oE '[0-9]+ error\(s\)' | head -1 || true)"
+    warnings="$(printf '%s\n' "$out" | grep -oE '[0-9]+ warning\(s\)' | head -1 || true)"
+    pass "$2: Check passed (${errors:-0 error(s)}, ${warnings:-0 warning(s)})"
+  else
+    printf '%s\n' "$out" | tail -25 >&2
+    fail "$2: no 'Check passed' verdict"
+  fi
+}
+
+printf '\nkit: %s\n\n' "$ROOT"
+
+# 1. templates exist and are complete
+for tpl in template template-pilar; do
+  if [[ -f "$ROOT/$tpl/index.html" && -f "$ROOT/$tpl/assets/soundtrack.m4a" ]]; then
+    pass "$tpl: index.html + audio present"
+  else
+    fail "$tpl: missing index.html or assets/soundtrack.m4a"
+  fi
+done
+
+# 2. both templates pass the render gate
+verdict "$ROOT/template" 'template (16:9)'
+verdict "$ROOT/template-pilar" 'template-pilar (9:16)'
+
+# 3. the shipped sample is exactly what the builder produces from the example JSON
+if [[ -f "$SAMPLE" ]]; then
+  cp -a "$ROOT/template-pilar" "$TMP/probe"
+  rm -rf "$TMP/probe/renders" "$TMP/probe/.hyperframes"
+  if python3 "$ROOT/tools/build-dish.py" --data "$SAMPLE" --dest "$TMP/probe" --force >"$TMP/build.log" 2>&1; then
+    if diff -r --exclude=renders --exclude=.hyperframes "$ROOT/template-pilar" "$TMP/probe" >"$TMP/drift.diff" 2>&1; then
+      pass 'builder: sample matches builder output (no drift)'
+    else
+      head -20 "$TMP/drift.diff" >&2
+      fail 'builder: template-pilar drifted from tools/pilar-templates'
+    fi
+  else
+    tail -5 "$TMP/build.log" >&2
+    fail 'builder: build-dish.py failed on the example JSON'
+  fi
+else
+  fail "builder: example data missing at ${SAMPLE#"$ROOT"/}"
+fi
+
+# 4. builder refuses bad data instead of shipping a broken frame
+bad_province="$TMP/bad-province.json"
+python3 - "$SAMPLE" "$bad_province" <<'PY'
+import json, sys
+data = json.load(open(sys.argv[1]))
+data["provinsi_id"] = "provinsi-yang-tidak-ada"
+json.dump(data, open(sys.argv[2], "w"))
+PY
+if python3 "$ROOT/tools/build-dish.py" --data "$bad_province" --dest "$TMP/never" >/dev/null 2>&1; then
+  fail 'builder: accepted an unknown provinsi_id'
+elif [[ -e "$TMP/never" ]]; then
+  fail 'builder: left a half-built project behind after a rejected input'
+else
+  pass 'builder: rejects unknown provinsi_id before writing anything'
+fi
+
+# 5. the repo stays kit-only: no account data or render artifacts tracked
+if git -C "$ROOT" rev-parse --git-dir >/dev/null 2>&1; then
+  tracked_bad="$(git -C "$ROOT" ls-files | grep -E '^projects/|/renders/|\.hyperframes/|\.wav$' || true)"
+  if [[ -z "$tracked_bad" ]]; then
+    pass 'git: no projects/, renders/ or .hyperframes/ files tracked'
+  else
+    printf '%s\n' "$tracked_bad" >&2
+    fail 'git: kit repo tracks account data or render artifacts'
+  fi
+  if git -C "$ROOT" ls-files --error-unmatch bin/hf >/dev/null 2>&1; then
+    pass 'git: bin/hf is the versioned wrapper'
+  else
+    fail 'git: bin/hf is not tracked'
+  fi
+else
+  fail 'git: not a repository'
+fi
+
+printf '\n'
+if (( failures > 0 )); then
+  printf 'kit-check: %d failure(s)\n' "$failures" >&2
+  exit 1
+fi
+printf 'kit-check: kit is healthy\n'

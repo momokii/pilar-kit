@@ -33,6 +33,7 @@ python3 ../../../tools/build-dish.py --data ../dishes/<slug>.json --dest . --for
 hf check                           # gate: lint, runtime, layout, motion, kontras AA, audio
 hf snapshot --at 0,3.2,6.5,11.5     # PNG frame kunci — dibaca sebelum render
 hf render --crf 20                 # → renders/<video>_<timestamp>.mp4
+bin/kit-check                      # kesehatan kit: template + builder + git, exit 0 = sehat
 ```
 
 Untuk video pilar: **tulis JSON, bukan HTML**. `build-dish.py` mengisi nama, hook, provinsi +
@@ -58,6 +59,6 @@ jalankan ulang dengan `--force`. Selalu `hf`, jangan `npx hyperframes` (wrapper 
 
 ## Batas
 
-- Thread kit: ubah kit, verifikasi (`hf projects`, `cd template-pilar && hf check`), lalu lapor.
+- Thread kit: ubah kit, verifikasi dengan `bin/kit-check`, lalu lapor.
 - Thread akun: kerjakan video akun itu; jangan mengubah kit demi satu video.
 - Yang tidak bisa diverifikasi → tulis `NOT VERIFIED`. Jangan klaim selesai tanpa bukti.

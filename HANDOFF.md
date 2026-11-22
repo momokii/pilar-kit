@@ -101,6 +101,8 @@ python3 tools/build-dish.py --data <dish.json> --dest <project> [--force] \
         [--seri <name>] [--handle @<akun>]
 python3 tools/build-map.py                # rebuild assets/maps from geoBoundaries (ODbL)
 python3 tools/make-soundtrack.py --duration 22 --ticks 5,10,15 --arrival 19.6   # run in a video
+
+bin/kit-check                     # prove the kit still builds: templates, drift, git hygiene
 ```
 
 Brief first: `hf project <akun>` creates `projects/<akun>/BRIEF.md`. Fill it (account,

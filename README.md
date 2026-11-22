@@ -73,6 +73,20 @@ cd projects/<akun>/<video>
 hf check && hf snapshot --at 0,3,6 && hf render --crf 18
 ```
 
+## Verifikasi kit
+
+Satu perintah, dipakai sebelum menyentuh apa pun dan setelah mengubah kit:
+
+```bash
+bin/kit-check            # pakai cache (cepat)
+bin/kit-check --fresh    # ulang dari nol (~30 s)
+```
+
+Yang diperiksa: kedua template lengkap, `hf check` lolos di `template/` dan `template-pilar/`,
+sampel pilar identik dengan output builder (tidak ada drift `tools/pilar-templates`), builder
+menolak data salah **sebelum** menulis apa pun, dan repo git tidak melacak `projects/`,
+`renders/`, atau `.hyperframes/`. Exit 0 hanya kalau semua lolos.
+
 ## Alur revisi (tanpa membuat ulang)
 
 1. Semua permintaan revisi dikerjakan di folder video yang sama.

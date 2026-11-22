@@ -8,3 +8,6 @@ node_modules/
 # kit sample render
 /template-pilar/renders/
 /template-pilar/.hyperframes/
+
+# account data — production, never part of the kit
+/projects/
