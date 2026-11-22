@@ -49,6 +49,7 @@ jalankan ulang dengan `--force`. Selalu `hf`, jangan `npx hyperframes` (wrapper 
 | Foto / gambar | **tidak ada** foto pihak ketiga, footage, atau wajah. Visual = tipografi + SVG peta + gerak |
 | Font | bundel (`Inter`, `JetBrains Mono`) atau file di `assets/fonts/` lewat `@font-face` |
 | Klaim | satu fakta = satu sumber tingkat 1–2 (`content/BRIEF.md` §13); klaim sengketa ditulis "diklaim" |
+| Kode | MIT (`LICENSE`); aset peta tetap ODbL dan wajib diatribusikan di kartu akhir |
 
 ## Gate sebelum render
 

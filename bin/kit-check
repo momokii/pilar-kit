@@ -58,6 +58,17 @@ for tpl in template template-pilar; do
   fi
 done
 
+# 1b. the licence is the canonical MIT text, so GitHub keeps detecting it
+if [[ -f "$ROOT/LICENSE" ]]; then
+  if [[ "$(head -n 1 "$ROOT/LICENSE")" == "MIT License" ]] && grep -q 'WITHOUT WARRANTY OF ANY KIND' "$ROOT/LICENSE"; then
+    pass 'LICENSE: canonical MIT text'
+  else
+    fail 'LICENSE: not the canonical MIT text (GitHub would report NOASSERTION)'
+  fi
+else
+  fail 'LICENSE: missing'
+fi
+
 # 2. both templates pass the render gate
 verdict "$ROOT/template" 'template (16:9)'
 verdict "$ROOT/template-pilar" 'template-pilar (9:16)'
@@ -106,11 +117,13 @@ if git -C "$ROOT" rev-parse --git-dir >/dev/null 2>&1; then
     printf '%s\n' "$tracked_bad" >&2
     fail 'git: kit repo tracks account data or render artifacts'
   fi
-  if git -C "$ROOT" ls-files --error-unmatch bin/hf >/dev/null 2>&1; then
-    pass 'git: bin/hf is the versioned wrapper'
-  else
-    fail 'git: bin/hf is not tracked'
-  fi
+  for f in bin/hf bin/kit-check LICENSE; do
+    if git -C "$ROOT" ls-files --error-unmatch "$f" >/dev/null 2>&1; then
+      pass "git: $f is tracked"
+    else
+      fail "git: $f is not tracked"
+    fi
+  done
 else
   fail 'git: not a repository'
 fi
