@@ -108,6 +108,18 @@ menolak data salah **sebelum** menulis apa pun, dan repo git tidak melacak `proj
 - Teks sengaja diletakkan di grid selebar 96 px margin: bawa `data-layout-allow-safe-zone` supaya
   audit zona aman TikTok/Reels/Shorts tidak salah lapor. Ini keputusan desain, bukan pelanggaran.
 
+## Lisensi
+
+Kode dan skrip di repo ini **MIT** (lihat `LICENSE`). Aset punya aturannya sendiri dan tidak
+tertimpa lisensi kode:
+
+| Aset | Lisensi | Kewajiban |
+|---|---|---|
+| Peta (`template/assets/maps/`, turunan geoBoundaries) | **ODbL 1.0** | atribusi `Peta: geoBoundaries (ODbL)` di kartu akhir setiap video |
+| Font di `assets/fonts/` | lisensi upstream masing-masing | jangan di-redistribusi di luar repo ini |
+| Audio (`tools/make-soundtrack.py`) | MIT | digenerate lokal, tidak ada sampel pihak ketiga |
+| Data akun (`projects/`) | bukan bagian repo | tidak pernah di-commit |
+
 ## Catatan teknis
 
 - Browser: memakai Chromium Playwright lewat `HYPERFRAMES_BROWSER_PATH` (diatur `hf`). Tanpa itu
