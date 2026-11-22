@@ -110,8 +110,8 @@ menolak data salah **sebelum** menulis apa pun, dan repo git tidak melacak `proj
 
 ## Lisensi
 
-Kode dan skrip di repo ini **MIT** (lihat `LICENSE`). Aset punya aturannya sendiri dan tidak
-tertimpa lisensi kode:
+Kode dan skrip di repo ini **MIT** (lihat `LICENSE`; teks kanonik, tanpa tambahan, supaya GitHub
+mendeteksinya). Aset punya aturannya sendiri dan tidak tertimpa lisensi kode:
 
 | Aset | Lisensi | Kewajiban |
 |---|---|---|

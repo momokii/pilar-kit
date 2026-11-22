@@ -19,15 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-Assets and data carry their own terms, which this licence does not override:
-
-- Map geometry in `template/assets/maps/` is derived from geoBoundaries gbOpen
-  IDN ADM1, licensed ODbL 1.0. Any video or derivative made from it must credit
-  the source: "Peta: geoBoundaries (ODbL)".
-- Fonts in `assets/fonts/` keep their upstream licences.
-- Audio is generated locally by `tools/make-soundtrack.py` and is covered by
-  the MIT licence above.
-- Account data under `projects/` is not part of this repository.
