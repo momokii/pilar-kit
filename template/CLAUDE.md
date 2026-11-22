@@ -1,3 +1,11 @@
+> **Kit override — this project lives in the `video-maker` kit.**
+> Run commands through the `hf` wrapper, not `npx hyperframes`: `hf check`,
+> `hf snapshot --at <seconds>`, `hf render`. The wrapper pins hyperframes 0.9.69 and the
+> local Chromium, so no browser is ever downloaded. The account brief is one level up at
+> `projects/<akun>/BRIEF.md`, dish data at `projects/<akun>/dishes/<slug>.json`, and the
+> kit rules — asset licences, source policy, render gate — at `../../../AGENTS.md`.
+> The `npm run …` scripts below come from the upstream scaffold and are not used here.
+
 # HyperFrames Composition Project
 
 This folder is a [HyperFrames](https://hyperframes.heygen.com) video: HTML, CSS and seekable

@@ -118,7 +118,8 @@ column in the brief in step with `renders/`.
 4. Never tween `display`, `visibility`, or `autoAlpha` on a `.clip`.
 5. Never animate `left/top/width/height`; animate transforms (e.g. `scaleX`).
 6. Reading text ≥ **28 px** on a 1080 canvas; label text carries `data-layout-ignore`.
-7. Non-bundled fonts need `@font-face` to a file in `assets/fonts/` (template uses `FilmMono`).
+7. Non-bundled fonts need `@font-face` to a file in `assets/fonts/` (`template/` ships `FilmMono`;
+   `template-pilar/` uses the bundled `Inter` + `JetBrains Mono`).
 8. Asset paths are relative: `assets/...`.
 9. Include an `<audio>` clip with `id`, `data-start`, `data-duration`, `data-track-index`;
    otherwise `check` reports `film_silent`.
@@ -133,7 +134,8 @@ column in the brief in step with `renders/`.
 
 Revisions edit the existing project, never a new one.
 
-1. Change only the requested elements; target stable ids (`#headline`, `#card`, `#bubble`).
+1. Change only the requested elements; target stable ids (`#kepala`… i.e. the ids in
+   `index.html`/`compositions/`: `#h1-word`, `#p2-name`, `#f2-def`, `#e-handle`).
 2. `hf snapshot --at <seconds>` to compare before and after.
 3. `hf render` again; the new file lands in `renders/` beside the previous one.
 4. Report the new file path and the `hf check` result.

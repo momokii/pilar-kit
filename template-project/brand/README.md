@@ -1,6 +1,6 @@
 # brand/ — assets shared by every video in this project
 
-Put anything more than one video needs here, once. `hf new <product>/<video>` copies the
+Put anything more than one video needs here, once. `hf new <akun>/<video>` copies the
 contents of this folder into the new video as `assets/brand/...`, so the composition always
 loads it with a relative path (`assets/brand/logo.svg`) — required by the renderer.
 

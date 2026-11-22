@@ -1,4 +1,4 @@
-# <product> — video project brief
+# <akun> — video project brief
 
 Fill this in **before** the first composition. Agents read this file before writing any
 video in this folder; it is the single source of truth for look, tone, claims and audio.
@@ -116,7 +116,7 @@ cd projects/<akun>/<video> && hf check && hf snapshot --at 0,3.2,6.5,11.5 && hf 
 ## 8. Videos in this project
 
 One row per video. Folder name is the path under this project folder; run
-`hf new <product>/<video>` to create it.
+`hf new <akun>/<video> [template]` to create it.
 
 | # | folder | goal | duration | ratio | status | latest render |
 |---|---|---|---|---|---|---|
