@@ -4,6 +4,9 @@ Repo ini **kit produksi**, bukan repo konten. Kit menyediakan mesin (template, t
 akun video memakainya. Satu thread untuk kit, thread terpisah per akun — jangan dicampur.
 Repo ini git sejak 2026-11-21; `projects/` adalah data produksi dan sengaja tidak di-track.
 
+**Status (2026-11-22):** mesin siap — `bin/kit-check` hijau, `main` = tag `v0.1.1`, lisensi MIT,
+repo publik. Yang sudah ada, yang belum, dan langkah pertama: `HANDOFF.md` §2–§3 dan §7.
+
 ## Peta folder
 
 ```

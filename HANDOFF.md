@@ -2,7 +2,7 @@
 
 Self-contained handoff for any agent picking up video work on this machine. Read this file
 first; it does not depend on any prior conversation. Every claim below was verified on the
-machine on **2026-11-19**.
+machine on **2026-11-22**.
 
 ---
 
@@ -27,11 +27,13 @@ video-maker/
   template-project/         starter for an account folder: BRIEF.md + brand/
   tools/                    build-map.py, build-dish.py, pilar-templates/, icons/
   content/BRIEF.md          the pilot account brief; content/examples/ sample dish JSON
-  projects/<akun>/          one folder per account
+  projects/<akun>/          one folder per account — production data, gitignored
     BRIEF.md                the account brief — read it before writing any video
     brand/                  logo, fonts, screens, music shared by every video
     dishes/<slug>.json      data + sources per dish
     <video>/                one HyperFrames project per video
+  bin/kit-check             the kit's own gate: templates, drift, licence, git hygiene
+  LICENSE                   MIT for the code; the map stays ODbL
   HANDOFF.md  README.md  AGENTS.md  .gitignore
 ```
 
@@ -58,11 +60,13 @@ Make, revise and render videos from HTML/CSS with HyperFrames.
 | Item | Location (relative to the project root) | Verified |
 |---|---|---|
 | Template (16:9) | `template/` | `hf check` passes (2 cosmetic warnings) |
-| Template (9:16 pillar) | `template-pilar/` | `hf check --no-cache` clean: 0/0, 0 layout, 36/36 AA; render 22.000 s 1080×1920 |
+| Template (9:16 pillar) | `template-pilar/` | `hf check --no-cache` clean: 0/0, 0 layout, 36/36 AA; render verified locally at 22.000 s 1080×1920 — `renders/` is gitignored, so a fresh clone has none until you run `hf render` |
 | Dish builder | `tools/build-dish.py` + `tools/pilar-templates/` | rebuild of the sample is byte-identical (no drift) |
 | Project starter | `template-project/` (`BRIEF.md`, `brand/README.md`) | `hf project` tested; brief not yet filled for a real product |
-| Accounts | `projects/<akun>/<video>/` | `projects/petarasa/` (rendang built by hand), `v3-boxbox`, legacy `demo-e2e` |
+| Accounts | `projects/<akun>/<video>/` | present locally and **untracked**: `petarasa/` (rendang built by hand), `v3-boxbox`, `kevelry-v3`, legacy `demo-e2e`. Never committed; a fresh clone starts empty |
 | CLI wrapper | `bin/hf` → `~/.local/bin/hf` | pins `hyperframes@0.9.69` + Chromium; `hf --help`, template arg tested |
+| Kit gate | `bin/kit-check` (11 checks) | green on 2026-11-22: templates, drift, licence, git hygiene |
+| Repo | `origin` = github.com/momokii/pilar-kit | public, `main` = `v0.1.1`, MIT; topics + GitHub Release still unset (metadata, not git) |
 | Skills | `~/.agents/skills/hyperframes{,-cli,-registry}`, `media-use`, `reverse-any-video`, `style-sampling` | installed on disk |
 | Agent rules | `~/.pi/agent/AGENTS.md`, `~/.config/opencode/AGENTS.md` → "Video & motion" | present |
 | Browser | `~/.cache/ms-playwright/chromium-1255/chrome-linux64/chrome` | used by the wrapper |
@@ -76,8 +80,11 @@ unavailable.
 ## 3. First actions, then stop
 
 1. Read `~/.agents/skills/hyperframes/SKILL.md` (contract) and `hyperframes-cli/SKILL.md` (commands).
-2. Run `hf projects`, then `cd template-pilar && hf check` to confirm the engine works.
-3. **Stop and wait.** Do not create a video until the user asks for one.
+2. Run `bin/kit-check` — one command, 11 gates, exit 0 means the engine is healthy. Then `hf projects`
+   to see which accounts exist locally.
+3. Read §7 before proposing work: it lists what is deliberately missing (other pillar cards, CI,
+   sample approval) so you do not rebuild it or claim it exists.
+4. **Stop and wait.** Do not create a video until the user asks for one.
 
 Do not reinstall anything, do not run `npx hyperframes` directly, and do not download Chrome.
 
