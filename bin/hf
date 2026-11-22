@@ -18,8 +18,10 @@
 set -eu
 
 HYPERFRAMES_VERSION="0.9.69"
-BROWSER="/home/kelanach/.cache/ms-playwright/chromium-1255/chrome-linux64/chrome"
-ROOT="${VIDEO_MAKER_ROOT:-/home/kelanach/Public/main-linux-kelanach/code-berkah-titipan-tuhan/code/personal_prjct/video-maker}"
+BROWSER="${HYPERFRAMES_BROWSER_PATH:-$HOME/.cache/ms-playwright/chromium-1255/chrome-linux64/chrome}"
+# resolve through symlinks (~/.local/bin/hf -> <repo>/bin/hf) so the kit is location-free
+self="$(readlink -f -- "$0" 2>/dev/null || printf '%s' "$0")"
+ROOT="${VIDEO_MAKER_ROOT:-$(cd -- "$(dirname -- "$self")/.." && pwd)}"
 PROJECTS="$ROOT/projects"
 
 usage() {

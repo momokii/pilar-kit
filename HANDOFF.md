@@ -11,7 +11,7 @@ machine on **2026-11-19**.
 Open the T3 project **`video-maker`**. Its root is:
 
 ```
-/home/kelanach/Public/main-linux-kelanach/code-berkah-titipan-tuhan/code/personal_prjct/video-maker
+~/Public/main-linux-kelanach/code-berkah-titipan-tuhan/code/personal_prjct/video-maker
 ```
 
 Start the session with that directory as the working directory. Every path in this document is

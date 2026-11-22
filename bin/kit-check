@@ -9,7 +9,7 @@
 # projects/, and the builder runs in a mktemp dir that is removed on exit.
 set -Eeuo pipefail
 
-ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT="$(cd -- "$(dirname -- "$(readlink -f -- "${BASH_SOURCE[0]}")")/.." && pwd)"
 HF="$ROOT/bin/hf"
 SAMPLE="$ROOT/content/examples/contoh-rendang.json"
 FRESH=()
